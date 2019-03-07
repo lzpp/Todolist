@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>待办事项</title>
+    <link rel="stylesheet" href="todolist.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+        <div class="app">
+    <header>
+    <div class="layout fx">
+       
+       <h1>Todolist</h1>
+       <form action=""  id="from" v-on:submit.prevent="" >
+        <input type="text" placeholder="请输入待办事项" v-model="newTodos" v-on:keyup.enter="addData()">
+      </form> 
+        <button @click="addData()" class="addd" >添加</button>
+   </div>
+    </header>
+    <section id="content">
+        <div class="layout">
+            <h2>正在进行</h2>
+            <ul>
+                <li v-for="(item,index) in todos" v-if="!item.isComplete">
+                <input type="checkbox" v-on:click="sel(index)" v-model="item.isComplete">
+                  {{index+1}}.{{item.title}}
+                  <button @click="removeData(index)">del</button>
+            </li>
+            </ul>  
+            <h2>已经完成</h2>
+            <ul>
+                <li v-for="(item,index) in todos" v-if="item.isComplete" >
+                    <input type="checkbox" v-model="item.isComplete" @change="saveData()">
+                    {{index+1}}.{{item.title}}
+                    <button @click="removeData(index)">del</button>
+                </li>
+            </ul>  
+        </div>
+    </section>
+      <footer>
+          <div class="layout">
+              <p>Copyright © 2014 todolist.cn clear</p>
+          </div>
+      </footer>
+      </div>
+      <script src="todo.js"></script>
+      
+      <script>
+          var a = new Vue({
+              el:".app",
+              data(){
+                  return{
+                      newTodos:[],
+                       todos:[]
+                  }
+              },
+              computed:{
+                  counter:function(){
+                      var c = {doing:0,finish:0};
+                      this.todos.forEach(function(item){
+                          if(!item.isComplete){
+                              c.doing++;
+                          }else{
+                              c.finish++;
+                          }
+                      })
+                      return c;
+                  }
+              },
+              methods:{
+                  sel(index) {
+                      this.todos[index].isComplete = ! this.todos[index].isComplete;
+                    //   localStorage.setItem("todos",JSON.stringify(this.todos));
+                    Storage.set("todos",this.todos);
+                  },
+                  removeData(index){
+                      //删除数组
+                      this.todos.splice(index,1);
+                    //   localStorage.setItem("todos",JSON.stringify(this.todos));
+                    Storage.set("todos",this.todos);
+                  },
+                  addData(){
+                      //添加数据
+                      var length = this.todos.length-1;
+                      this.todos.push(
+                          {id:length,title:this.newTodos,isComplete:false}
+                      );
+                      this.newTodos=" ";
+                    //   localStorage.setItem("todos",JSON.stringify(this.todos));
+                    Storage.set("todos",this.todos);
+                  },
+                  saveData(){
+                    Storage.set("todos",this.todos);
+                  }
+              },
+              mounted(){
+                //   var todos=JSON.parse(localStorage.getItem("todos"));
+               var todos= Storage.get("todos");
+                  if(todos){
+                      this.todos=todos;
+                  }
+              }
+          })
+      </script>
+ 
+</body>
+</html>
